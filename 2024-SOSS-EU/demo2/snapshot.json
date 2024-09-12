@@ -1,0 +1,14 @@
+{
+  "components": [
+    {
+      "name": "golden-container",
+      "containerImage": "quay.io/konflux-ci/ec-golden-image:latest",
+      "source": {
+        "git": {
+          "url": "https://github.com/miscreant/mischief",
+          "revision": "cafebabe"
+        }
+      }
+    }
+  ]
+}
