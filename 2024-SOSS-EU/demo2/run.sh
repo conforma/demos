@@ -24,10 +24,8 @@ printf '{
   ]
 }' "${IMAGE}" "${GIT_REPO}" "${GIT_SHA}" > snapshot.json
 
-clear
-
 pe "jq . snapshot.json"
-pe "ec validate image --images snapshot.json --policy github.com/enterprise-contract/config//default --public-key public.key --ignore-rekor --show-successes"
+pe "ec validate image --images snapshot.json --policy github.com/enterprise-contract/config//default --public-key public.key --info --show-successes --ignore-rekor"
 pe "curl -sSl https://raw.githubusercontent.com/enterprise-contract/config/main/default/policy.yaml | yq ."
 
 printf '{
@@ -43,9 +41,9 @@ printf '{
       }
     }
   ]
-}' "${IMAGE}" "miscreant/mischief" "cafebabe" > snapshot.json
+}' "${IMAGE}" "miscreant/mischief" "cafebabe" > vile.json
 
-pe "jq . snapshot.json"
-pe 'ec validate image --images snapshot.json --policy github.com/enterprise-contract/config//default --public-key public.key --ignore-rekor --output text --output attestation=attestation.json'
+pe "jq . vile.json"
+pe 'ec validate image --images vile.json --policy github.com/enterprise-contract/config//default --public-key public.key --info --output text --output attestation=attestation.json --ignore-rekor'
 pe "jq -s '.[0].predicate.materials[] | select(.uri | startswith(\"git+\"))' attestation.json"
 echo https://github.com/enterprise-contract/ec-policies/blob/main/policy/release/slsa_source_correlated.rego

@@ -1,9 +1,9 @@
 #!/bin/bash
-
 . ../demo-magic.sh
 
 DEMO_PROMPT="${GREEN}➜ ${CYAN}\W ${COLOR_RESET}"
 TYPE_SPEED=30
+export BAT_THEME=GitHub
 
 IMAGE="quay.io/konflux-ci/ec-golden-image:latest"
 GIT_REPO=enterprise-contract/golden-container
@@ -39,11 +39,9 @@ printf '{
   ]
 }' "${IMAGE}" "${GIT_REPO}" "${GIT_SHA}" > snapshot.json
 
-clear
-
 pe "yq . policy.yaml"
-pe "bat --theme=GitHub rules/github.rego"
-pe "ec validate image --image ${IMAGE} --policy policy.yaml --ignore-rekor --show-successes"
+pe "bat rules/github.rego"
+pe "ec validate image --image ${IMAGE} --policy policy.yaml --info --show-successes --ignore-rekor"
 pe "yq -i e '.sources[0].ruleData.allowed_github_origins |= \"acme-org\"' policy.yaml"
 pe "yq . policy.yaml"
-pe "ec validate image --image ${IMAGE} --policy policy.yaml --ignore-rekor --show-successes"
+pe "ec validate image --image ${IMAGE} --policy policy.yaml --info --show-successes --ignore-rekor"
