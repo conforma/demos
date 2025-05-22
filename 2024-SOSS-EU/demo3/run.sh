@@ -6,7 +6,7 @@ TYPE_SPEED=30
 export BAT_THEME=GitHub
 
 IMAGE="quay.io/konflux-ci/ec-golden-image:latest"
-GIT_REPO=enterprise-contract/golden-container
+GIT_REPO=conforma/golden-container
 GIT_SHA=${GIT_SHA:-$(curl -s "https://api.github.com/repos/${GIT_REPO}/commits?per_page=1" | jq -r '.[0].sha')}
 
 cat > policy.yaml << EOF
@@ -21,7 +21,7 @@ sources:
   - policy:
       - ./rules
     ruleData:
-      allowed_github_origins: enterprise-contract
+      allowed_github_origins: conforma
 EOF
 
 printf '{
