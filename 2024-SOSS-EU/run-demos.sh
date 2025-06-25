@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 image=$(podman build --quiet --file <(cat <<DOCKERFILE
-FROM quay.io/enterprise-contract/ec-cli:snapshot
+FROM quay.io/conforma/cli:snapshot
 
 USER 0
 
