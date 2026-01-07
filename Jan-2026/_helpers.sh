@@ -1,6 +1,45 @@
 #!/bin/bash
 set -euo pipefail
 
+# Create a file with given content
+function create-file() {
+  local filename="$1"
+  local content="$2"
+  echo "$content" > $filename
+}
+
+# Append to a file with given content
+function append-file() {
+  local filename="$1"
+  local content="$2"
+  echo "$content" >> $filename
+}
+
+# Base functionality for custom file rendering
+function show-file() {
+  local filename="$1"
+  local cmd="$2"
+  show-cmd "cat $filename"
+  run-cmd "$cmd"
+}
+
+# Pretty print some yaml
+function show-yaml() {
+  # Use yq because we like consistent formatting.
+  # Use bat so all syntax highlighting uses the same color
+  # theme, and so we can show/highlight specific lines.
+  show-file "$1" \
+    "yq . $1 | bat -n -l yaml ${2:-}"
+}
+
+# Pretty print some rego
+function show-rego() {
+  # Use opa fmt because we like consistent formatting.
+  # Use bat for nice syntax highlighting.
+  show-file "$1" \
+    "ec opa fmt < $1 | bat -n -l rego ${2:-}"
+}
+
 # Output a fancy section heading. Assume you want to add a pause
 # at the end of the current section before starting a new one
 function h1() {
