@@ -76,7 +76,14 @@ function show-then-run() {
 function pause() {
   local default_msg="$(ansi darkgray "Press Enter to continue...")"
   local msg="${1:-$default_msg}"
-  read -p "$msg"
+
+  if [ "${TRANSCRIPT_MODE:-}" = 1 ]; then
+    if [ -n "${1:-}" ]; then
+      echo "$msg"
+    fi
+  else
+    read -p "$msg"
+  fi
   nl
 }
 
