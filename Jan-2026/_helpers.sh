@@ -151,3 +151,10 @@ ansi() {
     printf '\e[%sm' "$code"
   fi
 }
+
+# So the generated files end up in their own directory
+setup-workdir() {
+  cd $(mktemp -d ./tmp-work-XXXX)
+}
+
+setup-workdir
