@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+markdown() {
+  [ "${MARKDOWN_MODE:-}" = 1 ]
+}
+
 # Create a file with given content
 function create-file() {
   local filename="$1"
@@ -26,18 +30,24 @@ function show-file() {
 # Pretty print some yaml
 function show-yaml() {
   # Use yq because we like consistent formatting.
-  # Use bat so all syntax highlighting uses the same color
-  # theme, and so we can show/highlight specific lines.
-  show-file "$1" \
-    "yq . $1 | bat -n -l yaml ${2:-}"
+  if markdown; then
+    printf '```yaml\n# file: %s\n\n%s\n```\n\n' "$1" "$(yq . "$1" | sed -n "${3:-p}")"
+  else
+    # Use bat so all syntax highlighting uses the same color
+    # theme, and so we can show/highlight specific lines.
+    show-file "$1" "yq . $1 | bat -n -l yaml ${2:-}"
+  fi
 }
 
 # Pretty print some rego
 function show-rego() {
   # Use opa fmt because we like consistent formatting.
-  # Use bat for nice syntax highlighting.
-  show-file "$1" \
-    "ec opa fmt < $1 | bat -n -l rego ${2:-}"
+  if markdown; then
+    printf '```rego\n# file: %s\n\n%s\n```\n' "$1" "$(ec opa fmt < "$1" | sed -n "${3:-p}")"
+  else
+    # Use bat for nice syntax highlighting.
+    show-file "$1" "ec opa fmt < $1 | bat --color always -n -l rego ${2:-}"
+  fi
 }
 
 # Output a fancy section heading. Assume you want to add a pause
@@ -52,24 +62,39 @@ function h1() {
   local text="$1"
   local line=$(sed 's/./─/g' <<< "$text")
 
-  # Uncomment to start each section on a clear screen
-  #clear
+  if markdown; then
+    printf '## %s\n\n' "$1"
+  else
+    # Uncomment to start each section on a clear screen
+    #clear
 
-  echo "╭─$line─╮"
-  echo "┝ $text ┥"
-  echo "╰─$line─╯"
+    echo "╭─$line─╮"
+    echo "┝ $text ┥"
+    echo "╰─$line─╯"
+  fi
+
 }
 
 # Show a command, then run it after the user hits enter
 function pause-then-run() {
-  pause "$(show-cmd "$1")"
-  run-cmd "$1"
+  if markdown; then
+    show-then-run "$1"
+  else
+    pause "$(show-cmd "$1")"
+    run-cmd "$1"
+  fi
 }
 
 # Show a command, then run it immediately
 function show-then-run() {
-  show-cmd "$1"
-  run-cmd "$1"
+  if markdown; then
+    printf '```ec\n%s\n' "\$ $1"
+    run-cmd "$1"
+    printf '```\n\n'
+  else
+    show-cmd "$1"
+    run-cmd "$1"
+  fi
 }
 
 # Output some text and wait for the user to press enter
@@ -117,7 +142,11 @@ function show-vars() {
 
 # Pretty-print a message
 function show-msg() {
-  printf "💬 %s\n\n" "$1" | fold -s -w 100
+  if markdown; then
+    printf "%s\n\n" "$1" | fold -s -w 100
+  else
+    printf "💬 %s\n\n" "$1" | fold -s -w 100
+  fi
 }
 
 # Output a line break
@@ -162,6 +191,17 @@ ansi() {
 # So the generated files end up in their own directory
 setup-workdir() {
   cd $(mktemp -d ./tmp-work-XXXX)
+}
+
+title() {
+  if markdown; then
+    printf "%s\ntitle: %s\n" "---" "$1"
+    printf "date: %s\n" "$(date +'%Y-%m-%dT%H:%M:%S%:z')"
+    printf "author: %s\n" "$2"
+    printf "%s\n" "---"
+  else
+    h1 "$1"
+  fi
 }
 
 setup-workdir

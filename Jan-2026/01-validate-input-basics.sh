@@ -2,7 +2,13 @@
 set -euo pipefail
 source _helpers.sh
 
-h1 "Validating arbitrary data"
+title "Validating arbitary data" "Simon Baird"
+
+show-msg "In this tutorial we'll introduce some basic Conforma concepts
+and work through some examples of applying policies against some arbitrary
+input data."
+
+h1 "ec validate input"
 
 show-msg $'Conforma can perform policy checks on arbitrary data with `ec
 validate input`. Let\'s try an example.'
@@ -64,9 +70,9 @@ pause-then-run 'ec validate input --file input.yaml --policy policy.yaml'
 
 h1 "Using --info for more detailed output"
 
-show-msg "The metadata associated with the policy rule is important for
-Conforma. Adding the --info flag will use the metadata to show more
-verbose/user-friendly output:"
+show-msg 'The metadata associated with the policy rule is important for
+Conforma. Adding the `--info` flag will use the metadata to show more
+verbose/user-friendly output:'
 
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml --info'
 
@@ -82,8 +88,8 @@ pause-then-run 'ec validate input --file input.yaml --policy policy.yaml --info'
 
 pause
 
-show-msg "By default there's not much output on success, but we can add
-the --show-successes flag to change that:"
+show-msg $'By default there\'s not much output on success, but we can add
+the `--show-successes` flag to change that:'
 
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml --info --show-successes'
 
@@ -113,7 +119,9 @@ warn contains result if {
 }
 '
 
-show-rego no-cats/main.rego -r17:
+show-msg "(Append to the existing file...)"
+
+show-rego no-cats/main.rego -r17: '17,$p'
 
 pause
 
@@ -125,7 +133,7 @@ h1 "Adding more detail to the violation reason"
 
 sed -i 's/"No cats allowed!"/sprintf("A cat named %s was found!", [animal.name])/' no-cats/main.rego
 
-show-rego no-cats/main.rego "-r11:15 -H14:14"
+show-rego no-cats/main.rego "-r11:15 -H14:14" "11,15p"
 
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml'
 
