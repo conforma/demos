@@ -27,11 +27,24 @@ function show-file() {
   run-cmd "$cmd"
 }
 
+# In the markdown/blog post version we can't easily show line numbers.
+# So this is an alternative way to indicate that we're viewing an excerpt
+# from the file rather then the whole file.
+# If the sed param was: "17,$p"
+# This would produce: "\n# from-line: 17"
+function extract-start-line-text-from-sed-param() {
+  local sed_param="${1:-}"
+  if [ -n "$sed_param" ]; then
+    printf '\n# from-line: %s' ${sed_param%%,*}
+  fi
+}
+
 # Pretty print some yaml
 function show-yaml() {
   # Use yq because we like consistent formatting.
   if markdown; then
-    printf '```yaml\n# file: %s\n\n%s\n```\n\n' "$1" "$(yq . "$1" | sed -n "${3:-p}")"
+    local from_line=$(extract-start-line-text-from-sed-param "${3:-}")
+    printf '```yaml\n# file: %s%s\n\n%s\n```\n\n' "$1" "$from_line" "$(yq . "$1" | sed -n "${3:-p}")"
   else
     # Use bat so all syntax highlighting uses the same color
     # theme, and so we can show/highlight specific lines.
@@ -43,7 +56,8 @@ function show-yaml() {
 function show-rego() {
   # Use opa fmt because we like consistent formatting.
   if markdown; then
-    printf '```rego\n# file: %s\n\n%s\n```\n' "$1" "$(ec opa fmt < "$1" | sed -n "${3:-p}")"
+    local from_line=$(extract-start-line-text-from-sed-param "${3:-}")
+    printf '```rego\n# file: %s%s\n\n%s\n```\n' "$1" "$from_line" "$(ec opa fmt < "$1" | sed -n "${3:-p}")"
   else
     # Use bat for nice syntax highlighting.
     show-file "$1" "ec opa fmt < $1 | bat --color always -n -l rego ${2:-}"
