@@ -129,7 +129,17 @@ function pause() {
 # Eval a command line
 function run-cmd() {
   set +e
-  eval "$1"
+  # The grep is to squelch the "For more information..." text in all the demo output
+  # since it's untidy and generally wrong. See https://issues.redhat.com/browse/EC-1603 .
+  # Note: This was previously `eval "$1"` which would run the command in the current shell
+  # instead of a subshell. IIUC without eval you won't be able to set env vars and have
+  # them visible outside the subshell, so beware I guess.
+  if markdown; then
+    bash -c "$1" | grep -v 'For more information about policy issues, see the policy documentation: https://conforma.dev/docs/policy/'
+  else
+    # The unbuffer is so we get color output by default even with the grep, (which we don't need in markdown)
+    unbuffer bash -c "$1" | grep -v 'For more information about policy issues, see the policy documentation: https://conforma.dev/docs/policy/'
+  fi
   set -e
   nl
 }
