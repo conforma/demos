@@ -182,3 +182,5 @@ that behavior with `--strict=false`:'
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml > output.txt; echo "Exit code: $?"; head -3 output.txt'
 
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml --strict=false > output.txt; echo "Exit code: $?"; head -3 output.txt'
+
+blog-footer
