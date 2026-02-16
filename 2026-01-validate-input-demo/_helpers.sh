@@ -228,4 +228,23 @@ title() {
   fi
 }
 
+# Because we change to the work dir when setup-workdir is called,
+# need to remember this so we can use it in the github url
+SCRIPT_DIR=$(pwd)
+
+# Used in blog-footer below
+github-url() {
+  local script_path=$(basename $SCRIPT_DIR)
+  local script_sha=$(git log -1 --format=%H)
+  echo "https://github.com/conforma/demos/tree/${script_sha}/${script_path}"
+}
+
+blog-footer() {
+  if markdown; then
+    echo "If you'd like to try the examples here for yourself, note that you can run
+this exercise interactively using the bash scripts [here]($(github-url))."
+    # Todo maybe: Explicitly say which version of ec we used
+  fi
+}
+
 setup-workdir
