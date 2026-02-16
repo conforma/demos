@@ -135,7 +135,7 @@ function run-cmd() {
   # instead of a subshell. IIUC without eval you won't be able to set env vars and have
   # them visible outside the subshell, so beware I guess.
   if markdown; then
-    bash -c "$1" | grep -v 'For more information about policy issues, see the policy documentation: https://conforma.dev/docs/policy/'
+    bash -c "$1" 2>&1 | grep -v 'For more information about policy issues, see the policy documentation: https://conforma.dev/docs/policy/'
   else
     # The unbuffer is so we get color output by default even with the grep, (which we don't need in markdown)
     unbuffer bash -c "$1" | grep -v 'For more information about policy issues, see the policy documentation: https://conforma.dev/docs/policy/'
