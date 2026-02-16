@@ -58,7 +58,7 @@ show-rego no-cats/main.rego
 
 pause
 
-show-msg "To use that policy, Conforma needs a policy.yaml file specifying a source:"
+show-msg $'To use that policy, Conforma needs a `policy.yaml` file specifying a source:'
 
 create-file policy.yaml 'sources:
 - policy:
@@ -177,7 +177,7 @@ h1 '"Strict" vs "non-strict"'
 
 show-msg 'By default we produce a non-zero exit code if there are any
 violations, which is useful to interrupt a script or a CI task. You can change
-that behavior if you need to with `--strict=false:`'
+that behavior with `--strict=false`:'
 
 pause-then-run 'ec validate input --file input.yaml --policy policy.yaml > output.txt; echo "Exit code: $?"; head -3 output.txt'
 
